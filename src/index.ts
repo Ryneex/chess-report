@@ -5,6 +5,8 @@ dotenv.config();
 
 import apiRouter from "./api";
 
+const PORT = process.env.PORT ?? 80;
+
 const app = express();
 
 app.use(express.json());
@@ -21,6 +23,6 @@ app.get("/privacy", async (req, res) => {
     res.sendFile(path.resolve("src/public/pages/privacy/index.html"));
 });
 
-app.listen(process.env.PORT, () => {
-    console.log("Server running.");
+app.listen(PORT, () => {
+    console.log(`Server running on port : ${PORT}`);
 });
