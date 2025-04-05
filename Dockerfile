@@ -1,17 +1,29 @@
-FROM node:20
+FROM node:22-alpine AS base
 
-LABEL name="wintrcat/freechess"
-LABEL version="1.0.0"
+# builder
+FROM base AS builder
+WORKDIR /app
 
-WORKDIR /usr/app/
+# install dependencies
+COPY package.json package-lock.json .
+RUN npm install
 
+# Copy application files
 COPY . .
 
-RUN npm install -g typescript
-RUN npm i
+RUN npm run build
 
-ENV PORT 80
 
-EXPOSE 80/tcp
+# production
+FROM base AS production
+WORKDIR /app
 
-ENTRYPOINT ["npm", "start"]
+COPY package.json package-lock.json .
+RUN npm install --omit=dev
+
+COPY --from=builder /app/dist dist
+COPY . .
+
+EXPOSE 80
+
+CMD [ "node", "dist/index.js" ]
