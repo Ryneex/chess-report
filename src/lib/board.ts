@@ -1,50 +1,51 @@
 import { Chess, Square } from "chess.js";
 
 interface Coordinate {
-    x: number,
-    y: number
+    x: number;
+    y: number;
 }
 
 export interface InfluencingPiece {
-    square: Square,
-    color: string,
-    type: string
+    square: Square;
+    color: string;
+    type: string;
 }
 
 export const promotions = [undefined, "b", "n", "r", "q"];
 
 export const pieceValues: { [key: string]: number } = {
-    "p": 1,
-    "n": 3,
-    "b": 3,
-    "r": 5,
-    "q": 9,
-    "k": Infinity,
-    "m": 0
+    p: 1,
+    n: 3,
+    b: 3,
+    r: 5,
+    q: 9,
+    k: Infinity,
+    m: 0,
 };
 
 function getBoardCoordinates(square: Square): Coordinate {
     return {
         x: "abcdefgh".indexOf(square.slice(0, 1)),
-        y: parseInt(square.slice(1)) - 1
+        y: parseInt(square.slice(1)) - 1,
     };
 }
 
 function getSquare(coordinate: Coordinate): Square {
-    return "abcdefgh".charAt(coordinate.x) + (coordinate.y + 1).toString() as Square;
+    return ("abcdefgh".charAt(coordinate.x) +
+        (coordinate.y + 1).toString()) as Square;
 }
 
 export function getAttackers(fen: string, square: Square): InfluencingPiece[] {
-
     let attackers: InfluencingPiece[] = [];
 
     let board = new Chess(fen);
     let piece = board.get(square);
 
     // Set colour to move to opposite of attacked piece
-    board.load(fen
-        .replace(/(?<= )(?:w|b)(?= )/g, piece.color == "w" ? "b" : "w")
-        .replace(/ [a-h][1-8] /g, " - ")
+    board.load(
+        fen
+            .replace(/(?<= )(?:w|b)(?= )/g, piece.color == "w" ? "b" : "w")
+            .replace(/ [a-h][1-8] /g, " - "),
     );
 
     // Find each legal move that captures attacked piece
@@ -55,7 +56,7 @@ export function getAttackers(fen: string, square: Square): InfluencingPiece[] {
             attackers.push({
                 square: move.from,
                 color: move.color,
-                type: move.piece
+                type: move.piece,
             });
         }
     }
@@ -72,16 +73,19 @@ export function getAttackers(fen: string, square: Square): InfluencingPiece[] {
 
             let offsetSquare = getSquare({
                 x: Math.min(Math.max(pieceCoordinate.x + xOffset, 0), 7),
-                y: Math.min(Math.max(pieceCoordinate.y + yOffset, 0), 7)
+                y: Math.min(Math.max(pieceCoordinate.y + yOffset, 0), 7),
             });
             let offsetPiece = board.get(offsetSquare);
             if (!offsetPiece) continue;
 
-            if (offsetPiece.color == oppositeColour && offsetPiece.type == "k") {
+            if (
+                offsetPiece.color == oppositeColour &&
+                offsetPiece.type == "k"
+            ) {
                 oppositeKing = {
                     color: offsetPiece.color,
                     square: offsetSquare,
-                    type: offsetPiece.type
+                    type: offsetPiece.type,
                 };
                 break;
             }
@@ -95,7 +99,7 @@ export function getAttackers(fen: string, square: Square): InfluencingPiece[] {
     try {
         board.move({
             from: oppositeKing.square,
-            to: square
+            to: square,
         });
 
         kingCaptureLegal = true;
@@ -106,11 +110,9 @@ export function getAttackers(fen: string, square: Square): InfluencingPiece[] {
     }
 
     return attackers;
-
 }
 
 export function getDefenders(fen: string, square: Square) {
-
     let board = new Chess(fen);
     let piece = board.get(square);
     let testAttacker = getAttackers(fen, square)[0];
@@ -118,9 +120,10 @@ export function getDefenders(fen: string, square: Square) {
     // If there is an attacker we can test capture the piece with
     if (testAttacker) {
         // Set player to move to colour of test attacker
-        board.load(fen
-            .replace(/(?<= )(?:w|b)(?= )/g, testAttacker.color)
-            .replace(/ [a-h][1-8] /g, " - ")
+        board.load(
+            fen
+                .replace(/(?<= )(?:w|b)(?= )/g, testAttacker.color)
+                .replace(/ [a-h][1-8] /g, " - "),
         );
 
         // Capture the defended piece with the test attacker
@@ -129,7 +132,7 @@ export function getDefenders(fen: string, square: Square) {
                 board.move({
                     from: testAttacker.square,
                     to: square,
-                    promotion: promotion
+                    promotion: promotion,
                 });
 
                 // Return the attackers that can now capture the test attacker
@@ -138,27 +141,29 @@ export function getDefenders(fen: string, square: Square) {
         }
     } else {
         // Set player to move to defended piece colour
-        board.load(fen
-            .replace(/(?<= )(?:w|b)(?= )/g, piece.color)
-            .replace(/ [a-h][1-8] /g, " - ")
+        board.load(
+            fen
+                .replace(/(?<= )(?:w|b)(?= )/g, piece.color)
+                .replace(/ [a-h][1-8] /g, " - "),
         );
 
         // Replace defended piece with an enemy queen
-        board.put({
-            color: piece.color == "w" ? "b" : "w",
-            type: "q"
-        }, square);
+        board.put(
+            {
+                color: piece.color == "w" ? "b" : "w",
+                type: "q",
+            },
+            square,
+        );
 
         // Return the attackers of that piece
         return getAttackers(board.fen(), square);
     }
 
     return [];
-
 }
 
 export function isPieceHanging(lastFen: string, fen: string, square: Square) {
-
     let lastBoard = new Chess(lastFen);
     let board = new Chess(fen);
 
@@ -169,37 +174,45 @@ export function isPieceHanging(lastFen: string, fen: string, square: Square) {
     let defenders = getDefenders(fen, square);
 
     // If piece was just traded equally or better, not hanging
-    if (pieceValues[lastPiece.type] >= pieceValues[piece.type] && lastPiece.color != piece.color) {
+    if (
+        pieceValues[lastPiece.type] >= pieceValues[piece.type] &&
+        lastPiece.color != piece.color
+    ) {
         return false;
     }
 
     // If a rook took a minor piece that was only defended by one other
     // minor piece, it was a favourable rook exchange, so rook not hanging
     if (
-        piece.type == "r"
-        && pieceValues[lastPiece.type] == 3 
-        && attackers.every(atk => pieceValues[atk.type] == 3)
-        && attackers.length == 1
+        piece.type == "r" &&
+        pieceValues[lastPiece.type] == 3 &&
+        attackers.every((atk) => pieceValues[atk.type] == 3) &&
+        attackers.length == 1
     ) {
         return false;
     }
 
     // If piece has an attacker of lower value, hanging
-    if (attackers.some(atk => pieceValues[atk.type] < pieceValues[piece.type])) {
+    if (
+        attackers.some((atk) => pieceValues[atk.type] < pieceValues[piece.type])
+    ) {
         return true;
     }
 
     if (attackers.length > defenders.length) {
         let minAttackerValue = Infinity;
         for (let attacker of attackers) {
-            minAttackerValue = Math.min(pieceValues[attacker.type], minAttackerValue);
+            minAttackerValue = Math.min(
+                pieceValues[attacker.type],
+                minAttackerValue,
+            );
         }
-        
+
         // If taking the piece even though it has more attackers than defenders
         // would be a sacrifice in itself, not hanging
         if (
-            pieceValues[piece.type] < minAttackerValue 
-            && defenders.some(dfn => pieceValues[dfn.type] < minAttackerValue)
+            pieceValues[piece.type] < minAttackerValue &&
+            defenders.some((dfn) => pieceValues[dfn.type] < minAttackerValue)
         ) {
             return false;
         }
@@ -207,7 +220,7 @@ export function isPieceHanging(lastFen: string, fen: string, square: Square) {
         // If any of the piece's defenders are pawns, then the sacrificed piece
         // is the defending pawn. The least valuable attacker is equal in value
         // to the sacrificed piece at this point of the logic
-        if (defenders.some(dfn => pieceValues[dfn.type] == 1)) {
+        if (defenders.some((dfn) => pieceValues[dfn.type] == 1)) {
             return false;
         }
 
@@ -215,5 +228,4 @@ export function isPieceHanging(lastFen: string, fen: string, square: Square) {
     }
 
     return false;
-
 }

@@ -5,7 +5,7 @@ let reportResults: Report | undefined;
 
 function logAnalysisInfo(message: string) {
     $("#status-message").css("display", "block");
-    
+
     $("#status-message").css("background", "rgba(49, 51, 56, 255)");
     $("#status-message").css("color", "white");
     $("#status-message").html(message);
@@ -13,13 +13,16 @@ function logAnalysisInfo(message: string) {
 
 function logAnalysisError(message: string) {
     $("#evaluation-progress-bar").css("display", "none");
-    $("#secondary-message").html('');
+    $("#secondary-message").html("");
     $("#status-message").css("padding", "10px 3px 10px 3px");
     $("#status-message").css("display", "block");
     $("#status-message").css("background", "rgba(239, 65, 70, 0.4");
     $("#status-message").css("color", "white");
 
-    $("#status-message").html(`<i class="fa-solid fa-circle-info" style="color: #ffffff;"></i>` + message);
+    $("#status-message").html(
+        `<i class="fa-solid fa-circle-info" style="color: #ffffff;"></i>` +
+            message,
+    );
 
     ongoingEvaluation = false;
 }
@@ -31,9 +34,6 @@ async function evaluate() {
 
     $("#report-cards").css("display", "none");
     $("#evaluation-progress-bar").css("display", "none");
-
-
-    
 
     // Disallow evaluation if another evaluation is ongoing
     if (ongoingEvaluation) return;
@@ -85,7 +85,9 @@ async function evaluate() {
 
     updateBoardPlayers();
 
-    $("#secondary-message").html("It can take around a minute to process a full game.");
+    $("#secondary-message").html(
+        "It can take around a minute to process a full game.",
+    );
 
     // Fetch cloud evaluations where possible
     for (let position of positions) {
@@ -168,14 +170,14 @@ async function evaluate() {
 
     const stockfishManager = setInterval(() => {
         // If all evaluations have been generated, move on
-        
+
         if (!positions.some((pos) => !pos.topLines)) {
             clearInterval(stockfishManager);
 
             logAnalysisInfo("Evaluation complete.");
             $("#evaluation-progress-bar").val(100);
             $(".g-recaptcha").css("display", "inline");
-            if(!document.hasFocus()){
+            if (!document.hasFocus()) {
                 let snd = new Audio("static/media/ping.mp3");
                 snd.play();
             }
@@ -231,45 +233,64 @@ function loadReportCards() {
     $("#report-cards").css("display", "flex");
 
     if (!!reportResults) {
-        $("#white-accuracy").html(`${reportResults.accuracies.white.toFixed(1)}%`);
-        $("#black-accuracy").html(`${reportResults.accuracies.black.toFixed(1)}%`);
+        $("#white-accuracy").html(
+            `${reportResults.accuracies.white.toFixed(1)}%`,
+        );
+        $("#black-accuracy").html(
+            `${reportResults.accuracies.black.toFixed(1)}%`,
+        );
 
         // Initialize classification container for next analysis
         $("#classification-count-container").empty();
 
         // Make classification count section
-        for (const classification of Object.keys(reportResults.classifications.white)) {
-            if (classification === "book" || classification === "forced") continue;
+        for (const classification of Object.keys(
+            reportResults.classifications.white,
+        )) {
+            if (classification === "book" || classification === "forced")
+                continue;
 
             const classificationRow = $("<div>").prop({
-                class: "classification-count-row"
+                class: "classification-count-row",
             });
-        
+
             // Create white's classification count
-            const whiteClassificationCount = $("<div>").prop({
-                class: "classification-count-white"
-            }).css({
-                color: classificationColours[classification]
-            }).html(`${reportResults.classifications.white[classification as Classifications]}`);
+            const whiteClassificationCount = $("<div>")
+                .prop({
+                    class: "classification-count-white",
+                })
+                .css({
+                    color: classificationColours[classification],
+                })
+                .html(
+                    `${reportResults.classifications.white[classification as Classifications]}`,
+                );
 
             // Create black's classification count
-            const blackClassificationCount = $("<div>").prop({
-                class: "classification-count-black"
-            }).css({
-                color: classificationColours[classification]
-            }).html(`${reportResults.classifications.black[classification as Classifications]}`);
-
+            const blackClassificationCount = $("<div>")
+                .prop({
+                    class: "classification-count-black",
+                })
+                .css({
+                    color: classificationColours[classification],
+                })
+                .html(
+                    `${reportResults.classifications.black[classification as Classifications]}`,
+                );
 
             // Create classification icon and message
             const classificationContent = $("<div>").prop({
-                class: "classification-count-content"
+                class: "classification-count-content",
             });
-            $(classificationIcons[classification]!).appendTo(classificationContent);
-            $("<div>").html(`${classification}`)
-            .css({
-                color: classificationColours[classification]
-            }).appendTo(classificationContent);
-
+            $(classificationIcons[classification]!).appendTo(
+                classificationContent,
+            );
+            $("<div>")
+                .html(`${classification}`)
+                .css({
+                    color: classificationColours[classification],
+                })
+                .appendTo(classificationContent);
 
             // Add white's classification count
             whiteClassificationCount.appendTo(classificationRow);
@@ -296,7 +317,7 @@ function loadReportCards() {
 
 async function report() {
     // Remove CAPTCHA
-    
+
     $(".g-recaptcha").css("display", "none");
     $("#secondary-message").html("");
     $("#evaluation-progress-bar").attr("value", null);
@@ -343,7 +364,9 @@ $("#review-button").on("click", () => {
 
     if ($("#load-type-dropdown").val() == "json") {
         try {
-            let savedAnalysis: SavedAnalysis = JSON.parse($("#pgn").val()?.toString()!);
+            let savedAnalysis: SavedAnalysis = JSON.parse(
+                $("#pgn").val()?.toString()!,
+            );
 
             whitePlayer = savedAnalysis.players.white;
             blackPlayer = savedAnalysis.players.black;
@@ -363,10 +386,17 @@ $("#depth-slider").on("input", () => {
     let depth = parseInt($("#depth-slider").val()?.toString()!);
 
     if (depth <= 14) {
-        $("#depth-counter").html(depth + `|<i class="fa-solid fa-bolt" style="color: #ffffff;"></i>`);
+        $("#depth-counter").html(
+            depth + `|<i class="fa-solid fa-bolt" style="color: #ffffff;"></i>`,
+        );
     } else if (depth <= 17) {
-        $("#depth-counter").html(depth + `|<i class="fa-solid fa-wind" style="color: #ffffff;"></i>`);
+        $("#depth-counter").html(
+            depth + `|<i class="fa-solid fa-wind" style="color: #ffffff;"></i>`,
+        );
     } else {
-        $("#depth-counter").html(depth + `|<i class="fa-solid fa-hourglass-half" style="color: #ffffff;"></i>`);
+        $("#depth-counter").html(
+            depth +
+                `|<i class="fa-solid fa-hourglass-half" style="color: #ffffff;"></i>`,
+        );
     }
 });

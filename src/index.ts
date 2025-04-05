@@ -9,10 +9,7 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/static",
-    express.static("dist/public"),
-    express.static("src/public")
-);
+app.use("/static", express.static("dist/public"), express.static("src/public"));
 
 app.use("/api", apiRouter);
 

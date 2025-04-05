@@ -13,7 +13,7 @@
     height: 100vh;
 
     background-color: rgba(0, 0, 0, 0.7);
-}   
+}
 
 /*
     MODAL
@@ -84,14 +84,12 @@
     padding: 5px;
     border-radius: 10px;
 
-    
-
     width: 100%;
 
     background-color: var(--secondary-color);
     cursor: pointer;
 }
-#games-list{
+#games-list {
     border-radius: 10px;
     background-color: #0e0e0e !important;
 }
@@ -137,7 +135,7 @@
     transform: translateY(5px);
 }
 
-.move-btn{
+.move-btn {
     margin: 0px 0px 0px 0px;
     flex-wrap: wrap;
     width: 90%;
@@ -148,7 +146,7 @@
     background: none;
     border: none;
 }
-.move-btn i{
+.move-btn i {
     background-color: black;
     border-radius: 10px;
     font-size: 25px;

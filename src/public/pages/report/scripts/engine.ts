@@ -1,9 +1,8 @@
 class Stockfish {
-
     private worker = new Worker(
         typeof WebAssembly == "object"
-        ? "/static/scripts/stockfish-nnue-16.js"
-        : "/static/scripts/stockfish.js"
+            ? "/static/scripts/stockfish-nnue-16.js"
+            : "/static/scripts/stockfish.js",
     );
 
     depth = 0;
@@ -13,38 +12,58 @@ class Stockfish {
         this.worker.postMessage("setoption name MultiPV value 2");
     }
 
-    async evaluate(fen: string, targetDepth: number, verbose: boolean = false): Promise<EngineLine[]> {
+    async evaluate(
+        fen: string,
+        targetDepth: number,
+        verbose: boolean = false,
+    ): Promise<EngineLine[]> {
         this.worker.postMessage("position fen " + fen);
         this.worker.postMessage("go depth " + targetDepth);
 
         const messages: string[] = [];
         const lines: EngineLine[] = [];
 
-        return new Promise(res => {
-            this.worker.addEventListener("message", event => {
+        return new Promise((res) => {
+            this.worker.addEventListener("message", (event) => {
                 let message: string = event.data;
                 messages.unshift(message);
 
                 if (verbose) console.log(message);
 
                 // Get latest depth for progress monitoring
-                let latestDepth = parseInt(message.match(/(?:depth )(\d+)/)?.[1] || "0");
+                let latestDepth = parseInt(
+                    message.match(/(?:depth )(\d+)/)?.[1] || "0",
+                );
                 this.depth = Math.max(latestDepth, this.depth);
 
                 // Best move or checkmate log indicates end of search
-                if (message.startsWith("bestmove") || message.includes("depth 0")) {            
-                    let searchMessages = messages.filter(msg => msg.startsWith("info depth"));
+                if (
+                    message.startsWith("bestmove") ||
+                    message.includes("depth 0")
+                ) {
+                    let searchMessages = messages.filter((msg) =>
+                        msg.startsWith("info depth"),
+                    );
 
                     for (let searchMessage of searchMessages) {
                         // Extract depth, MultiPV line ID and evaluation from search message
-                        let idString = searchMessage.match(/(?:multipv )(\d+)/)?.[1];
-                        let depthString = searchMessage.match(/(?:depth )(\d+)/)?.[1];
+                        let idString =
+                            searchMessage.match(/(?:multipv )(\d+)/)?.[1];
+                        let depthString =
+                            searchMessage.match(/(?:depth )(\d+)/)?.[1];
 
-                        let moveUCI = searchMessage.match(/(?: pv )(.+?)(?= |$)/)?.[1];
+                        let moveUCI =
+                            searchMessage.match(/(?: pv )(.+?)(?= |$)/)?.[1];
 
                         let evaluation: Evaluation = {
-                            type: searchMessage.includes(" cp ") ? "cp" : "mate",
-                            value: parseInt(searchMessage.match(/(?:(?:cp )|(?:mate ))([\d-]+)/)?.[1] || "0")
+                            type: searchMessage.includes(" cp ")
+                                ? "cp"
+                                : "mate",
+                            value: parseInt(
+                                searchMessage.match(
+                                    /(?:(?:cp )|(?:mate ))([\d-]+)/,
+                                )?.[1] || "0",
+                            ),
                         };
 
                         // Invert evaluation if black to play since scores are from black perspective
@@ -60,13 +79,17 @@ class Stockfish {
                         let depth = parseInt(depthString);
 
                         // Discard if target depth not reached or lineID already present
-                        if (depth != targetDepth || lines.some(line => line.id == id)) continue;
-                        
+                        if (
+                            depth != targetDepth ||
+                            lines.some((line) => line.id == id)
+                        )
+                            continue;
+
                         lines.push({
                             id,
                             depth,
                             evaluation,
-                            moveUCI
+                            moveUCI,
                         });
                     }
 
@@ -82,10 +105,9 @@ class Stockfish {
 
                 this.worker.postMessage("uci");
                 this.worker.postMessage("setoption name MultiPV value 2");
-                
+
                 this.evaluate(fen, targetDepth, verbose).then(res);
             });
         });
     }
-
 }

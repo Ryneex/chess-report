@@ -4,92 +4,91 @@ declare class grecaptcha {
 }
 
 interface Profile {
-    username: string,
-    rating: string,
-    aiLevel?: string
+    username: string;
+    rating: string;
+    aiLevel?: string;
 }
 
 interface Game {
-    white: Profile,
-    black: Profile,
-    timeClass: string,
-    pgn: string
+    white: Profile;
+    black: Profile;
+    timeClass: string;
+    pgn: string;
 }
 
 interface Coordinate {
-    x: number,
-    y: number
+    x: number;
+    y: number;
 }
 
 interface Move {
-    san: string,
-    uci: string
+    san: string;
+    uci: string;
 }
 
 interface Evaluation {
-    type: string,
-    value: number
+    type: string;
+    value: number;
 }
 
 interface EngineLine {
-    id: number,
-    depth: number,
-    evaluation: Evaluation,
-    moveUCI: string,
-    moveSAN?: string
+    id: number;
+    depth: number;
+    evaluation: Evaluation;
+    moveUCI: string;
+    moveSAN?: string;
 }
 
 interface Position {
-    fen: string,
-    move?: Move,
-    topLines?: EngineLine[],
-    cutoffEvaluation?: Evaluation,
-    worker?: Stockfish | string
-    classification?: string,
-    opening?: string
+    fen: string;
+    move?: Move;
+    topLines?: EngineLine[];
+    cutoffEvaluation?: Evaluation;
+    worker?: Stockfish | string;
+    classification?: string;
+    opening?: string;
 }
 
-type Classifications = 
-    "brilliant" |
-    "great"|
-    "best"|
-    "excellent"|
-    "good"|
-    "inaccuracy"|
-    "mistake"|
-    "blunder"|
-    "book"|
-    "forced";
+type Classifications =
+    | "brilliant"
+    | "great"
+    | "best"
+    | "excellent"
+    | "good"
+    | "inaccuracy"
+    | "mistake"
+    | "blunder"
+    | "book"
+    | "forced";
 
 interface ClassificationCount extends Record<Classifications, number> {}
 
-
 interface Report {
     accuracies: {
-        white: number,
-        black: number
-    },
+        white: number;
+        black: number;
+    };
     classifications: {
-        white: ClassificationCount,
-        black: ClassificationCount
-    },
-    positions: Position[]
+        white: ClassificationCount;
+        black: ClassificationCount;
+    };
+    positions: Position[];
 }
 
 interface SavedAnalysis {
-    results: Report,
+    results: Report;
     players: {
-        white: Profile,
-        black: Profile
-    }
+        white: Profile;
+        black: Profile;
+    };
 }
 
 interface ParseResponse {
-    message?: string,
-    positions?: Position[]
+    message?: string;
+    positions?: Position[];
 }
 
 interface ReportResponse {
-    message?: string,
-    results?: Report 
+    message?: string;
+    results?: Report;
 }

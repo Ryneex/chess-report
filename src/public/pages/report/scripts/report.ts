@@ -1,28 +1,34 @@
-const bestClassifications = [
-    "brilliant",
-    "great",
-    "best",
-    "book",
-    "forced"
-];
+const bestClassifications = ["brilliant", "great", "best", "book", "forced"];
 
-function updateClassificationMessage(lastPosition: Position, position: Position) {
-
+function updateClassificationMessage(
+    lastPosition: Position,
+    position: Position,
+) {
     if (position.classification) {
         let classificationMessages: { [key: string]: string } = {
-            "great": "a great move",
-            "good":"an okay move",
-            "inaccuracy": "an inaccuracy",
-            "mistake": "a mistake",
-            "blunder": "a blunder",
-            "book": "theory"
+            great: "a great move",
+            good: "an okay move",
+            inaccuracy: "an inaccuracy",
+            mistake: "a mistake",
+            blunder: "a blunder",
+            book: "theory",
         };
 
-        $("#classification-icon").attr("src", `/static/media/${position.classification}.png`);
+        $("#classification-icon").attr(
+            "src",
+            `/static/media/${position.classification}.png`,
+        );
 
-        let message = classificationMessages[position.classification] ?? position.classification;
-        $("#classification-message").html(`${position.move?.san} is ${message}`);
-        $("#classification-message").css("color", classificationColours[position.classification]);
+        let message =
+            classificationMessages[position.classification] ??
+            position.classification;
+        $("#classification-message").html(
+            `${position.move?.san} is ${message}`,
+        );
+        $("#classification-message").css(
+            "color",
+            classificationColours[position.classification],
+        );
 
         $("#classification-message-container").css("display", "flex");
 
@@ -39,11 +45,9 @@ function updateClassificationMessage(lastPosition: Position, position: Position)
         $("#classification-message-container").css("display", "none");
         $("#top-alternative-message").css("display", "none");
     }
-
 }
 
 function updateEngineSuggestions(lines: EngineLine[]) {
-
     $(".engine-suggestion").remove();
     $("#engine-suggestions-title").css("display", "block");
 
@@ -60,8 +64,14 @@ function updateEngineSuggestions(lines: EngineLine[]) {
         } else {
             evaluation.html("M" + Math.abs(line.evaluation.value).toString());
         }
-        evaluation.css("background-color", line.evaluation.value >= 0 ? "#ffffff" : "var(--secondary-color)");
-        evaluation.css("color", line.evaluation.value >= 0 ? "var(--primary-color)" : "#ffffff");
+        evaluation.css(
+            "background-color",
+            line.evaluation.value >= 0 ? "#ffffff" : "var(--secondary-color)",
+        );
+        evaluation.css(
+            "color",
+            line.evaluation.value >= 0 ? "var(--primary-color)" : "#ffffff",
+        );
 
         let move = $("<span>");
         move.addClass("white");
@@ -70,21 +80,20 @@ function updateEngineSuggestions(lines: EngineLine[]) {
         engineSuggestion.append(evaluation, move);
         $("#engine-suggestions").append(engineSuggestion);
     }
-
 }
 
 $("#save-analysis-button").on("click", () => {
-
     let savedAnalysis = {
         players: {
             white: whitePlayer,
-            black: blackPlayer
+            black: blackPlayer,
         },
-        results: reportResults
+        results: reportResults,
     };
 
-    let reportBlob = new Blob([JSON.stringify(savedAnalysis)], {"type": "application/json"});
+    let reportBlob = new Blob([JSON.stringify(savedAnalysis)], {
+        type: "application/json",
+    });
 
     open(URL.createObjectURL(reportBlob));
-
 });

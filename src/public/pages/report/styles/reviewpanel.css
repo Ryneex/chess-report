@@ -498,7 +498,8 @@
     --dot-color: var(--primary-color);
     --dot-size: 2px;
     --dot-space: 10px;
-    background: linear-gradient(
+    background:
+        linear-gradient(
                 90deg,
                 var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
                 transparent 1%
