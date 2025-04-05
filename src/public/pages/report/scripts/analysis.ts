@@ -90,7 +90,7 @@ async function evaluate() {
     );
 
     // Fetch cloud evaluations where possible
-    for (let position of positions) {
+    for (const position of positions) {
         function placeCutoff() {
             let lastPosition = positions[positions.indexOf(position) - 1];
             if (!lastPosition) return;
@@ -176,17 +176,19 @@ async function evaluate() {
 
             logAnalysisInfo("Evaluation complete.");
             $("#evaluation-progress-bar").val(100);
-            $(".g-recaptcha").css("display", "inline");
+            // $(".g-recaptcha").css("display", "inline");
             if (!document.hasFocus()) {
                 let snd = new Audio("static/media/ping.mp3");
                 snd.play();
             }
-            $("#secondary-message").html(
-                "Please complete the CAPTCHA to continue.",
-            );
+            // $("#secondary-message").html(
+            //     "Please complete the CAPTCHA to continue.",
+            // );
 
             evaluatedPositions = positions;
             ongoingEvaluation = false;
+
+            report();
 
             return;
         }
